@@ -1,0 +1,12 @@
+{
+  "title": "HydroEventDetector",
+  "creators": [
+    {
+      "name": "Gonzalo Forero",
+      "affiliation": "University of Iowa"
+    }
+  ],
+  "description": "Detect hydrological events identifying peaks and calculating volumes",
+  "license": "MIT",
+  "keywords": ["peak detection", "hydrological events", "event volume"]
+}

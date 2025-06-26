@@ -49,7 +49,7 @@ Tobias Gauster, G. L., Daniel Koffler. (2022). Calculation of Low Flow Statistic
 
 pip install Hydro-Event-Detector
 
-2. import libraries
+2. Import libraries
    
 from pathlib import Path
 
@@ -58,7 +58,7 @@ import pandas as pd
 import hydro_event_detector as hed
 from hydro_event_detector import HydroEventDetector
 
-3. read the files that you want to process, here I will provide an example with parquet and with numpy but can be other formats as well
+3. Read the files that you want to process, here I will provide an example with parquet and with numpy but can be other formats as well
 
 # Read the paths
 HPC_HOME = Path().home() / "hpchome" # example using a server, not neccesary it is just part of the path used 
@@ -148,10 +148,10 @@ hed.plot_events = MethodType(patched_plot_events, hed)
 # Execute
 hed.plot_events("2019", "2021") #change the interested dates
 
-# Enjoy the results, explore the information related with peaks, volume, baseflow.
+# You successfully run the package here. Explore the information related with peaks, volume, baseflow.
 
-_______________________
-# Libraries conflict
+________________________________________________________________________________
+# Libraries conflict chapter in the case you faced problems running the package
 
 pip install Hydro-Event-Detector
 # if you have an conflict with other libreries you can unstall them

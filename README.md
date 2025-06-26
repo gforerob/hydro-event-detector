@@ -60,49 +60,60 @@ from hydro_event_detector import HydroEventDetector
 
 3. Read the files that you want to process, here I will provide an example with parquet and with numpy but can be other formats as well
 
-# Read the paths
+# Example of Read parquet files to provide the data ready to the package
 HPC_HOME = Path().home() / "hpchome" # example using a server, not neccesary it is just part of the path used 
 INPUT_FOLDER = HPC_HOME / "usgs_qa_rev" # folder with the files that you want to process
 STATIONS_LIST = HPC_HOME / "2025_April25_QA_Rev" / "codes_for_review" / "peak-hydro-event" / "src" / "usgs_june_pairing.csv" # list of USGS stations codes to process
-
-# Read the data
 df_codes = pd.read_csv(STATIONS_LIST, dtype={"USGS": str})
 usgs_id = df_codes["USGS"].iloc[0]
 file_path = INPUT_FOLDER / f"{usgs_id}.parquet"
-
 df = pd.read_parquet(file_path)
 df["datetime"] = pd.to_datetime(df["datetime"])
 df = df.set_index("datetime").sort_index()
 df = df[~df.index.duplicated(keep="first")]
-
 # --- Keep nans and separate for calculation ---
 complete = df["Discharge_cfs"]
 valid = complete[complete.notna()]
-
 # --- Valids to numpy ---
 #datetimes = valid.index.to_numpy()
 datetimes_naive = pd.to_datetime(valid.index).tz_localize(None)
 streamflow = pd.to_numeric(valid.values, errors='coerce')
 
-# Extract event peaks, volumes and baseflow
+# Example of Read numpy files to provide the data ready to the package
+
+DATES_5MIN_PATH = Path("/home/gforerobuitrago/hpchome/2025_April25_QA_Rev/codes_for_review/peak-hydro-event/src/esto_no/clean_dates.npy")
+STATIONS_LIST = Path("/home/gforerobuitrago/hpchome/2025_April25_QA_Rev/codes_for_review/june_16_2025_final_codes_peaks_pairing/usgs_june_pairing_timezone3.csv")
+FLOW_FOLDER = Path("/home/gforerobuitrago/hpchome/crest_npy_1d_final_por_estacion")
+df_codes = pd.read_csv(STATIONS_LIST, dtype={"USGS": str})
+usgs_id = df_codes["USGS"].iloc[0]
+
+date_range_all = np.load(DATES_5MIN_PATH)
+streamflow_all = np.load(FLOW_FOLDER / f"{usgs_id}.npy")
+
+valid_mask = streamflow_all > 0
+datetimes = pd.to_datetime(date_range_all[valid_mask]).tz_localize(None)
+streamflow = streamflow_all[valid_mask]
+
+
+# Use the information with the package. Use the datetimes_naive and streamflow data in a format usable for the package.
 
 hed = HydroEventDetector(datetimes_naive, streamflow)
-hed.baseflow_lyne_hollick()
+hed.baseflow_lyne_hollick() #extract baseflow
 #hed.baseflow
-hed.detect_events()
+hed.detect_events() #Find all the events
 hed.create_events_dataframe()
 full_df = hed.dataframe
 #full_df
-hed.filter_events(90)
+hed.filter_events(90) #Filter the significant events, you can change 90 is a percetile you can change it depending on your results reviewed in the plot
 hed.create_events_dataframe()
 filtered_df = hed.dataframe
-filtered_df
+filtered_df # dataframe with all the information ready for your analysis
 
-# Interactive plot 
+# Interactive plot in plotly
 
 hed.plot_events("2019", "2021") # Run this and change the interested dates 
 
-# If do you have plotly conflicts use html (Not necessary, use just if the previous plot does not work)
+# If do you have plotly conflicts use html for plot (Not necessary, use just if the previous plot does not work)
 
 from types import MethodType
 
@@ -171,6 +182,178 @@ np.__version__
 import hydro_event_detector as hed
 # if you are successfull you can go directly to the import libraries or number 2.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+📦 Hydro-Event-Detector – Example of Use
+✅ 1. Install the Package
+bash
+Copy
+Edit
+pip install Hydro-Event-Detector
+If you encounter installation errors, they are likely related to your environment. Please refer to the Library Conflict Troubleshooting section at the end of this file.
+
+📚 2. Import Required Libraries
+python
+Copy
+Edit
+from pathlib import Path
+import pandas as pd
+import hydro_event_detector as hed
+from hydro_event_detector import HydroEventDetector
+📂 3. Load Data
+🔹 Example: Read Parquet Files
+python
+Copy
+Edit
+HPC_HOME = Path().home() / "hpchome"
+INPUT_FOLDER = HPC_HOME / "usgs_qa_rev"
+STATIONS_LIST = HPC_HOME / "2025_April25_QA_Rev" / "codes_for_review" / "peak-hydro-event" / "src" / "usgs_june_pairing.csv"
+
+df_codes = pd.read_csv(STATIONS_LIST, dtype={"USGS": str})
+usgs_id = df_codes["USGS"].iloc[0]
+
+file_path = INPUT_FOLDER / f"{usgs_id}.parquet"
+df = pd.read_parquet(file_path)
+df["datetime"] = pd.to_datetime(df["datetime"])
+df = df.set_index("datetime").sort_index()
+df = df[~df.index.duplicated(keep="first")]
+
+# Separate valid values
+complete = df["Discharge_cfs"]
+valid = complete[complete.notna()]
+
+# Convert to numpy format
+datetimes_naive = pd.to_datetime(valid.index).tz_localize(None)
+streamflow = pd.to_numeric(valid.values, errors='coerce')
+🔹 Example: Read NumPy Files
+python
+Copy
+Edit
+import numpy as np
+
+DATES_5MIN_PATH = Path("/home/gforerobuitrago/.../clean_dates.npy")
+STATIONS_LIST = Path("/home/gforerobuitrago/.../usgs_june_pairing_timezone3.csv")
+FLOW_FOLDER = Path("/home/gforerobuitrago/.../crest_npy_1d_final_por_estacion")
+
+df_codes = pd.read_csv(STATIONS_LIST, dtype={"USGS": str})
+usgs_id = df_codes["USGS"].iloc[0]
+
+date_range_all = np.load(DATES_5MIN_PATH)
+streamflow_all = np.load(FLOW_FOLDER / f"{usgs_id}.npy")
+
+valid_mask = streamflow_all > 0
+datetimes = pd.to_datetime(date_range_all[valid_mask]).tz_localize(None)
+streamflow = streamflow_all[valid_mask]
+⚙️ 4. Run the Package
+python
+Copy
+Edit
+hed = HydroEventDetector(datetimes_naive, streamflow)
+
+# Extract baseflow
+hed.baseflow_lyne_hollick()
+
+# Detect and filter events
+hed.detect_events()
+hed.create_events_dataframe()
+full_df = hed.dataframe
+
+hed.filter_events(90)  # 90 is a percentile threshold
+hed.create_events_dataframe()
+filtered_df = hed.dataframe
+📈 5. Plot Detected Events (Interactive Plot with Plotly)
+python
+Copy
+Edit
+hed.plot_events("2019", "2021")
+If you face issues with plotly, use the HTML fallback method below.
+
+🛠 6. HTML Fallback for Plotly (if needed)
+python
+Copy
+Edit
+from types import MethodType
+
+def patched_plot_events(self, start: str, end: str) -> None:
+    import numpy as np
+    import pandas as pd
+    import plotly.graph_objects as go
+
+    dates = self.date_range
+    streamflow = self.streamflow
+    baseflow = self.baseflow
+    events_df = self.dataframe
+
+    start_np = np.datetime64(start)
+    end_np = np.datetime64(end)
+
+    sf_series = pd.Series(streamflow, index=pd.to_datetime(dates))
+    bf_series = pd.Series(baseflow, index=pd.to_datetime(dates))
+
+    sf_slice = sf_series[start_np:end_np]
+    bf_slice = bf_series[start_np:end_np]
+
+    events_slice = events_df[
+        (events_df["date_end"] >= start_np) &
+        (events_df["date_start"] <= end_np)
+    ]
+
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=sf_slice.index, y=sf_slice.values, mode="lines", name="Streamflow"))
+    fig.add_trace(go.Scatter(x=bf_slice.index, y=bf_slice.values, mode="lines", name="Baseflow", line=dict(dash="dot")))
+    fig.add_trace(go.Scatter(x=events_slice["date_start"], y=events_slice["flow_start"], mode="markers", name="Start"))
+    fig.add_trace(go.Scatter(x=events_slice["date_end"], y=events_slice["flow_end"], mode="markers", name="End"))
+    fig.add_trace(go.Scatter(x=events_slice["date_peak"], y=events_slice["flow_peak"], mode="markers", name="Peak Flow"))
+    fig.add_trace(go.Scatter(x=events_slice["date_peak"], y=events_slice["baseflow_peak"], mode="markers", name="Peak Baseflow"))
+
+    fig.update_layout(title=f"Hydrologic Events From {start} To {end}", xaxis_title="Date", yaxis_title="Flow (cfs)")
+    fig.write_html(f"plot_events_{start}_{end}.html")
+    print(f"Plot saved as plot_events_{start}_{end}.html")
+
+# Apply the custom method
+hed.plot_events = MethodType(patched_plot_events, hed)
+
+# Run it
+hed.plot_events("2019", "2021")
+🚨 Library Conflict Troubleshooting
+If you encounter issues installing or using the package, try the following steps:
+
+bash
+Copy
+Edit
+# Step 1: Uninstall conflicting libraries
+pip uninstall pygeohydro bqplot nldi-xstool -y
+
+# Step 2: Upgrade pip
+pip install --upgrade pip
+
+# Step 3: Reinstall the package
+pip install Hydro-Event-Detector
+
+# Step 4: If NumPy version causes issues
+pip uninstall numpy
+pip install numpy==1.26.4
+Verify:
+
+python
+Copy
+Edit
+import numpy as np
+print(np.__version__)
+
+import hydro_event_detector as hed
 
 
 

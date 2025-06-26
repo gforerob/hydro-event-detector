@@ -44,7 +44,7 @@ McMahon, R. J. N. a. T. A. (1990). Evaluation of Automated Techniques for Base F
 Smith, S. W. (1997). The Scientist and Engineer's Guide to Digital Signal Processing. 
 Tobias Gauster, G. L., Daniel Koffler. (2022). Calculation of Low Flow Statistics for Daily Stream Flow Data. In 0.9.12 (Version 0.9.12) https://cran.r-project.org/web/packages/lfstat/lfstat.pdf
 
-### EXAMPLE OF USE!!!!
+# Example of use !!!!
 1. Review if do you have a conflic with other libraries installed by installing the package and review if you got errors, run this:
 
 pip install Hydro-Event-Detector
@@ -60,12 +60,12 @@ from hydro_event_detector import HydroEventDetector
 
 3. read the files that you want to process, here I will provide an example with parquet and with numpy but can be other formats as well
 
-# READ THE PATHS
+# Read the paths
 HPC_HOME = Path().home() / "hpchome" # example using a server, not neccesary it is just part of the path used 
 INPUT_FOLDER = HPC_HOME / "usgs_qa_rev" # folder with the files that you want to process
 STATIONS_LIST = HPC_HOME / "2025_April25_QA_Rev" / "codes_for_review" / "peak-hydro-event" / "src" / "usgs_june_pairing.csv" # list of USGS stations codes to process
 
-# READ THE DATA
+# Read the data
 df_codes = pd.read_csv(STATIONS_LIST, dtype={"USGS": str})
 usgs_id = df_codes["USGS"].iloc[0]
 file_path = INPUT_FOLDER / f"{usgs_id}.parquet"
@@ -84,7 +84,7 @@ valid = complete[complete.notna()]
 datetimes_naive = pd.to_datetime(valid.index).tz_localize(None)
 streamflow = pd.to_numeric(valid.values, errors='coerce')
 
-# USE THE PACKAGE TO EXTRACT EVENTS INFORMATION
+# Extract event peaks, volumes and baseflow
 
 hed = HydroEventDetector(datetimes_naive, streamflow)
 hed.baseflow_lyne_hollick()
@@ -98,11 +98,11 @@ hed.create_events_dataframe()
 filtered_df = hed.dataframe
 filtered_df
 
-# PLOT YOUR PROCESSED DATA FOR REVIEW
+# Interactive plot 
 
 hed.plot_events("2019", "2021") # Run this and change the interested dates 
 
-# SECOND WAY TO PLOT YOUR PROCESSED DATA FOR REVIEW in the case you have plotly conflicts (Not necessary if the previous plot work)
+# If do you have plotly conflicts use html (Not necessary, use just if the previous plot does not work)
 
 from types import MethodType
 
@@ -148,7 +148,7 @@ hed.plot_events = MethodType(patched_plot_events, hed)
 # Execute
 hed.plot_events("2019", "2021") #change the interested dates
 
-# Enjoy the results and explore the information related with peaks, volume, baseflow and others.
+# Enjoy the results, explore the information related with peaks, volume, baseflow.
 
 
 

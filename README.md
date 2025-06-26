@@ -132,7 +132,7 @@ hed.detect_events()
 hed.create_events_dataframe()
 full_df = hed.dataframe
 
-hed.filter_events(90)  # 90 is a percentile threshold
+hed.filter_events(90)  # 90 is a percentile threshold that you must change 
 hed.create_events_dataframe()
 filtered_df = hed.dataframe
 ```
@@ -142,7 +142,7 @@ filtered_df = hed.dataframe
 ## 📈 5. Plot Detected Events (Interactive Plot with Plotly)
 
 ```python
-hed.plot_events("2019", "2021")
+hed.plot_events("2019", "2021") #change the dates to plot
 ```
 
 > If you face issues with `plotly`, use the HTML fallback method below.

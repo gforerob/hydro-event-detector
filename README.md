@@ -45,7 +45,7 @@ Smith, S. W. (1997). The Scientist and Engineer's Guide to Digital Signal Proces
 Tobias Gauster, G. L., Daniel Koffler. (2022). Calculation of Low Flow Statistics for Daily Stream Flow Data. In 0.9.12 (Version 0.9.12) https://cran.r-project.org/web/packages/lfstat/lfstat.pdf
 
 # Example of use !!!!
-1. conflicts with other libraries management. Install the package and review if you got errors, if you got errors are related with your environment, read the chapter libraries conflict at the end of this file.
+1. Manage libraries conflict. Install the package and review if you got errors, if you got errors are related with your environment, read the chapter libraries conflict at the end of this file.
 
 pip install Hydro-Event-Detector
 

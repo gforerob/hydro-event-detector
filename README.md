@@ -186,21 +186,11 @@ import hydro_event_detector as hed
 
 
 
+# 📦 Hydro-Event-Detector – Example of Use
 
+## ✅ 1. Install the Package
 
-
-
-
-
-
-
-
-
-📦 Hydro-Event-Detector – Example of Use
-✅ 1. Install the Package
-bash
-Copy
-Edit
+```bash
 pip install Hydro-Event-Detector
 If you encounter installation errors, they are likely related to your environment. Please refer to the Library Conflict Troubleshooting section at the end of this file.
 
@@ -280,7 +270,7 @@ Edit
 hed.plot_events("2019", "2021")
 If you face issues with plotly, use the HTML fallback method below.
 
-🛠 6. HTML Fallback for Plotly (if needed)
+🛠 6. HTML Fallback for Plotly (Optional)
 python
 Copy
 Edit
@@ -322,12 +312,12 @@ def patched_plot_events(self, start: str, end: str) -> None:
     fig.write_html(f"plot_events_{start}_{end}.html")
     print(f"Plot saved as plot_events_{start}_{end}.html")
 
-# Apply the custom method
+# Apply monkeypatch
 hed.plot_events = MethodType(patched_plot_events, hed)
 
 # Run it
 hed.plot_events("2019", "2021")
-🚨 Library Conflict Troubleshooting
+⚠️ Library Conflict Troubleshooting
 If you encounter issues installing or using the package, try the following steps:
 
 bash
@@ -342,18 +332,27 @@ pip install --upgrade pip
 # Step 3: Reinstall the package
 pip install Hydro-Event-Detector
 
-# Step 4: If NumPy version causes issues
+# Step 4: If NumPy causes issues, uninstall and install a compatible version
 pip uninstall numpy
 pip install numpy==1.26.4
-Verify:
+Then verify:
 
 python
 Copy
 Edit
 import numpy as np
 print(np.__version__)
-
 import hydro_event_detector as hed
+✅ Done!
+You’ve successfully run the Hydro-Event-Detector package.
+You can now analyze peak events, baseflow, and hydrologic volumes using the output dataframe.
+
+
+
+
+
+
+
 
 
 

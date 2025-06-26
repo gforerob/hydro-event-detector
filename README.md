@@ -44,4 +44,113 @@ McMahon, R. J. N. a. T. A. (1990). Evaluation of Automated Techniques for Base F
 Smith, S. W. (1997). The Scientist and Engineer's Guide to Digital Signal Processing. 
 Tobias Gauster, G. L., Daniel Koffler. (2022). Calculation of Low Flow Statistics for Daily Stream Flow Data. In 0.9.12 (Version 0.9.12) https://cran.r-project.org/web/packages/lfstat/lfstat.pdf
 
+### EXAMPLE OF USE!!!!
+1. Review if do you have a conflic with other libraries installed by installing the package and review if you got errors, run this:
+
+pip install Hydro-Event-Detector
+
+2. import libraries
+   
+from pathlib import Path
+
+import pandas as pd
+
+import hydro_event_detector as hed
+from hydro_event_detector import HydroEventDetector
+
+3. read the files that you want to process, here I will provide an example with parquet and with numpy but can be other formats as well
+
+# READ THE PATHS
+HPC_HOME = Path().home() / "hpchome" # example using a server, not neccesary it is just part of the path used 
+INPUT_FOLDER = HPC_HOME / "usgs_qa_rev" # folder with the files that you want to process
+STATIONS_LIST = HPC_HOME / "2025_April25_QA_Rev" / "codes_for_review" / "peak-hydro-event" / "src" / "usgs_june_pairing.csv" # list of USGS stations codes to process
+
+# READ THE DATA
+df_codes = pd.read_csv(STATIONS_LIST, dtype={"USGS": str})
+usgs_id = df_codes["USGS"].iloc[0]
+file_path = INPUT_FOLDER / f"{usgs_id}.parquet"
+
+df = pd.read_parquet(file_path)
+df["datetime"] = pd.to_datetime(df["datetime"])
+df = df.set_index("datetime").sort_index()
+df = df[~df.index.duplicated(keep="first")]
+
+# --- Keep nans and separate for calculation ---
+complete = df["Discharge_cfs"]
+valid = complete[complete.notna()]
+
+# --- Valids to numpy ---
+#datetimes = valid.index.to_numpy()
+datetimes_naive = pd.to_datetime(valid.index).tz_localize(None)
+streamflow = pd.to_numeric(valid.values, errors='coerce')
+
+# USE THE PACKAGE TO EXTRACT EVENTS INFORMATION
+
+hed = HydroEventDetector(datetimes_naive, streamflow)
+hed.baseflow_lyne_hollick()
+#hed.baseflow
+hed.detect_events()
+hed.create_events_dataframe()
+full_df = hed.dataframe
+#full_df
+hed.filter_events(90)
+hed.create_events_dataframe()
+filtered_df = hed.dataframe
+filtered_df
+
+# PLOT YOUR PROCESSED DATA FOR REVIEW
+
+hed.plot_events("2019", "2021") # Run this and change the interested dates 
+
+# SECOND WAY TO PLOT YOUR PROCESSED DATA FOR REVIEW in the case you have plotly conflicts (Not necessary if the previous plot work)
+
+from types import MethodType
+
+def patched_plot_events(self, start: str, end: str) -> None:
+    import numpy as np
+    import pandas as pd
+    import plotly.graph_objects as go
+
+    dates = self.date_range
+    streamflow = self.streamflow
+    baseflow = self.baseflow
+    events_df = self.dataframe
+
+    start_np = np.datetime64(start)
+    end_np = np.datetime64(end)
+
+    sf_series = pd.Series(streamflow, index=pd.to_datetime(dates))
+    bf_series = pd.Series(baseflow, index=pd.to_datetime(dates))
+
+    sf_slice = sf_series[start_np:end_np]
+    bf_slice = bf_series[start_np:end_np]
+
+    events_slice = events_df[
+        (events_df["date_end"] >= start_np) &
+        (events_df["date_start"] <= end_np)
+    ]
+
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=sf_slice.index, y=sf_slice.values, mode="lines", name="Streamflow"))
+    fig.add_trace(go.Scatter(x=bf_slice.index, y=bf_slice.values, mode="lines", name="Baseflow", line=dict(dash="dot")))
+    fig.add_trace(go.Scatter(x=events_slice["date_start"], y=events_slice["flow_start"], mode="markers", name="Start"))
+    fig.add_trace(go.Scatter(x=events_slice["date_end"], y=events_slice["flow_end"], mode="markers", name="End"))
+    fig.add_trace(go.Scatter(x=events_slice["date_peak"], y=events_slice["flow_peak"], mode="markers", name="Peak Flow"))
+    fig.add_trace(go.Scatter(x=events_slice["date_peak"], y=events_slice["baseflow_peak"], mode="markers", name="Peak Baseflow"))
+
+    fig.update_layout(title=f"Hydrologic Events From {start} To {end}", xaxis_title="Date", yaxis_title="Flow (cfs)")
+    fig.write_html(f"plot_events_{start}_{end}.html")
+    print(f"plot saved as plot_events_{start}_{end}.html")
+
+# Apply monkeypatch
+hed.plot_events = MethodType(patched_plot_events, hed)
+
+# Execute
+hed.plot_events("2019", "2021") #change the interested dates
+
+# Enjoy the results and explore the information related with peaks, volume, baseflow and others.
+
+
+
+
 

@@ -45,7 +45,7 @@ Smith, S. W. (1997). The Scientist and Engineer's Guide to Digital Signal Proces
 Tobias Gauster, G. L., Daniel Koffler. (2022). Calculation of Low Flow Statistics for Daily Stream Flow Data. In 0.9.12 (Version 0.9.12) https://cran.r-project.org/web/packages/lfstat/lfstat.pdf
 
 # Example of use !!!!
-1. Review if do you have a conflic with other libraries installed by installing the package and review if you got errors, run this:
+1. conflicts with other libraries management. Install the package and review if you got errors, if you got errors are related with your environment, read the chapter libraries conflict at the end of this file.
 
 pip install Hydro-Event-Detector
 
@@ -149,6 +149,27 @@ hed.plot_events = MethodType(patched_plot_events, hed)
 hed.plot_events("2019", "2021") #change the interested dates
 
 # Enjoy the results, explore the information related with peaks, volume, baseflow.
+
+_______________________
+# Libraries conflict
+
+pip install Hydro-Event-Detector
+# if you have an conflict with other libreries you can unstall them
+#Example for unstall the libraries with conflict
+pip uninstall pygeohydro bqplot nldi-xstool -y
+#upgrade pip if its required
+%pip install --upgrade pip
+#try again
+pip install Hydro-Event-Detector
+# if your environment has problems with the new numpy versions unstall it and install a numpy version that works 
+%pip uninstall numpy
+# Example of install a version that workd for your environment
+%pip install numpy == 1.26.4
+#    import numpy as np
+np.__version__
+# import the library to review that works now
+import hydro_event_detector as hed
+# if you are successfull you can go directly to the import libraries or number 2.
 
 
 

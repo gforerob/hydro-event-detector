@@ -2,7 +2,10 @@
 name = "hydro-event-detector"
 version = "0.1.1"
 description = "Detect hydrological events identifying peaks and calculating volumes."
-authors = ["Gonzalo Forero Buitrago <gonzaloforero57@gmail.com>"]
+authors = [
+    {"Gonzalo Forero Buitrago <gonzaloforero57@gmail.com>", 
+    "Humberto Vergara Arrieta <humberto-vergaraarrieta@uiowa.edu>"}
+    ]
 readme = "README.md"
 packages = [{include = "hydro_event_detector", from = "src"}]
 

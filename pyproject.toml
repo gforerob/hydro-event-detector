@@ -1,9 +1,12 @@
 [project]
 name = "hydro-event-detector"
-version = "0.1.0"
+version = "0.1.1"
 description = "Detect hydrological events identifying peaks and calculating volumes."
 authors = [
-    {name = "Gonzalo Forero", email = "gonzaloforero57@gmail.com"}
+    {
+    name = "Gonzalo Forero Buitrago", email = "gonzaloforero57@gmail.com"
+    name = "Humberto Vergara Arrieta", email = "humberto-vergaraarrieta@uiowa.edu"
+    }
 ]
 readme = "README.md"
 requires-python = ">=3.11"

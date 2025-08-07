@@ -72,7 +72,7 @@ from hydro_event_detector import HydroEventDetector
 
 ---
 
-## 📂 3. Preprocess: Provide to the package the datetimes_naive and streamflow arrays required for processing
+## 📂 3. Preprocess: Provide to the package the datetimes_naive and streamflow arrays required for processing (To ensure the method works correctly, make sure there are no NaN values within the time series. Fill in missing data or use only sections of the time series that are complete.)
 
 ### 🔹 Preprocess Example with Parquet Files
 
